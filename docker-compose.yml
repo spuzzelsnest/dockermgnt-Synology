@@ -5,23 +5,23 @@ services:
   # HEIMDALL #
   ############
 heimdall:
-	image: linuxserver/heimdall
-	container_name: mgnt-heimdall
-	environment:
-	- PUID=${PUID}
-	- PGID=${PGID}
-	- TZ=${TZ}
-	volumes:
-	- ${CONFIG_PATH}/heimdall:/config
-	ports:
-	- ${HEIMDALL_PORT}:80
-	- ${HEIMDALL_PORT_SSL}:443
+  image: linuxserver/heimdall
+  container_name: mgnt-heimdall
+  environment:
+  - PUID=${PUID}
+  - PGID=${PGID}
+  - TZ=${TZ}
+  volumes:
+  - ${CONFIG_PATH}/heimdall:/config
+   ports:
+   - ${HEIMDALL_PORT}:80
+   - ${HEIMDALL_PORT_SSL}:443
   expose:
-	- ${HEIMDALL_PORT}
-	- ${HEIMDALL_PORT_SSL}
+   - ${HEIMDALL_PORT}
+   - ${HEIMDALL_PORT_SSL}
   restart: ${RESTART_POLICY}
   labels:
-	- 'com.centurylinklabs.watchtower.enable=true'
+  - 'com.centurylinklabs.watchtower.enable=true'
 
   #############
   # PORTAINER #

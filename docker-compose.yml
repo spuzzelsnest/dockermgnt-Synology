@@ -6,7 +6,7 @@ services:
   ############
 heimdall:
 	image: linuxserver/heimdall
-	container_name: mgmt-heimdall
+	container_name: mgnt-heimdall
 	environment:
 	- PUID=${PUID}
 	- PGID=${PGID}
@@ -28,7 +28,7 @@ heimdall:
   #############
   portainer:
     image: portainer/portainer-ce
-    container_name: mgmt-portainer
+    container_name: mgnt-portainer
     volumes:
       - ${DOCKER_SOCKET}:/var/run/docker.sock
       - portainer_data:/data
@@ -47,7 +47,7 @@ heimdall:
   # ==============
   watchtower:
     image: containrrr/watchtower
-    container_name: mgmt-watchtower
+    container_name: mgnt-watchtower
     restart: ${RESTART_POLICY}
     logging:
       driver: 'json-file'

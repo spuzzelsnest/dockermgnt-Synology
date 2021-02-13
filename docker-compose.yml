@@ -28,7 +28,7 @@ heimdall:
   #############
   portainer:
     image: portainer/portainer-ce
-    container_name: portainer
+    container_name: mgmt-portainer
     volumes:
       - ${DOCKER_SOCKET}:/var/run/docker.sock
       - portainer_data:/data
@@ -47,7 +47,7 @@ heimdall:
   # ==============
   watchtower:
     image: containrrr/watchtower
-    container_name: watchtower
+    container_name: mgmt-watchtower
     restart: ${RESTART_POLICY}
     logging:
       driver: 'json-file'
@@ -76,4 +76,3 @@ heimdall:
       - /etc/ssl/certs:/etc/ssl/certs
     labels:
       - 'com.centurylinklabs.watchtower.enable=true'
-      # - 'traefik.enable=false'

@@ -21,7 +21,7 @@ services:
       - ${HEIMDALL_PORT_SSL}
     restart: ${RESTART_POLICY}
     labels:
-      - 'com.centurylinklabs.watchtower.enable=true'
+      - ${UPDATE_ON}
 
   #############
   # PORTAINER #
@@ -40,7 +40,7 @@ services:
       - ${PORTAINER_PORT_SSL}
     restart: ${RESTART_POLICY}
     labels:
-      - 'com.centurylinklabs.watchtower.enable=true'
+      - ${UPDATE_ON}
 
   # ==============
   # = WATCHTOWER =
@@ -54,14 +54,15 @@ services:
       options:
         max-file: '5'
         max-size: '10m'
+    command: --interval 60 --cleanup --debug
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WATCHTOWER_CLEANUP=true
+#      - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_LABEL_ENABLE=${WATCHTOWER_LABEL_UPDATE}
-      - 'WATCHTOWER_SCHEDULE=${WATCHTOWER_SCHEDULE}'
-      - WATCHTOWER_DEBUG=true
+#      - 'WATCHTOWER_SCHEDULE=${WATCHTOWER_SCHEDULE}'
+#      - WATCHTOWER_DEBUG=true
       - WATCHTOWER_NOTIFICATIONS=${WATCHTOWER_NOTIFICATION}
       - WATCHTOWER_NOTIFICATION_SLACK_HOOK_URL=${WATCHTOWER_HOOK}
       - WATCHTOWER_NOTIFICATION_SLACK_CHANNEL=${WATCHTOWER_CHANNEL}
@@ -77,4 +78,4 @@ services:
       - ${DOCKER_SOCKET}:/var/run/docker.sock
       - /etc/ssl/certs:/etc/ssl/certs
     labels:
-      - 'com.centurylinklabs.watchtower.enable=true'
+      - ${UPDATE_ON}

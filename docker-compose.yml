@@ -21,9 +21,10 @@ services:
       - ${HEIMDALL_PORT_SSL}
     restart: ${RESTART_POLICY}
     labels:
-      - ${UPDATE_ON}
-
-  #############
+     # - ${UPDATE_ON}
+      - com.centurylinklabs.watchtower.enable=true
+ 
+ #############
   # PORTAINER #
   #############
   portainer:
@@ -40,7 +41,8 @@ services:
       - ${PORTAINER_PORT_SSL}
     restart: ${RESTART_POLICY}
     labels:
-      - ${UPDATE_ON}
+      #- ${UPDATE_ON}
+      - com.centurylinklabs.watchtower.enable=true
 
   # ==============
   # = WATCHTOWER =
@@ -54,7 +56,7 @@ services:
       options:
         max-file: '5'
         max-size: '10m'
-    command: --interval 60 --cleanup --debug
+    command: --interval 604800 --cleanup --debug
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -78,4 +80,5 @@ services:
       - ${DOCKER_SOCKET}:/var/run/docker.sock
       - /etc/ssl/certs:/etc/ssl/certs
     labels:
-      - ${UPDATE_ON}
+     # - ${UPDATE_ON}
+      - com.centurylinklabs.watchtower.enable=true

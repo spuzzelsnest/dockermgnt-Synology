@@ -1,9 +1,56 @@
-version: "3.2"
+version: "3.7"
 
 services:
-  ############
-  # HEIMDALL #
-  ############
+###########
+# PI-HOLE #
+###########
+  pihole:
+    container_name: pihole
+    hostname: dckvm-piHole
+    image: pihole/pihole:latest
+    restart: ${RESTART_POLICY}
+    env_file: .env
+    volumes:
+       - ./pihole/etc-pihole:/etc/pihole
+       - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+    cap_add:
+       - NET_ADMIN
+    dns:
+      - ${DNS01}
+      - ${DNS02}
+    environment:
+      - DNS1=${DNS01}
+      - DNS2=${DNS02}
+      - ServerIP=${PIHOLE_IP}
+      - DNSMASQ_LISTENING=all
+      - WEBPASSWORD=${PIHOLE_PASS}
+      - TZ= ${TZ}
+      - mac-address=${PIHOLE_MAC}
+    network_mode: mainLan
+
+####################
+# UNIFI CONTROLLER #
+####################
+  uniCon:
+    image: lscr.io/linuxserver/unifi-controller:latest
+    container_name: uniCon
+    restart: always
+    env_file: .env
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - MEM_LIMIT=1024 #optional
+      - MEM_STARTUP=1024 #optional
+    volumes:
+      - /unifi_data/config:/config
+    networks:
+      mainLan:
+        ipv4_address: ${UNIFI_IP}
+
+############
+# HEIMDALL #
+############
   heimdall:
     image: linuxserver/heimdall
     container_name: mgnt-heimdall
@@ -24,9 +71,9 @@ services:
      # - ${UPDATE_ON}
       - com.centurylinklabs.watchtower.enable=true
  
- #############
-  # PORTAINER #
-  #############
+#############
+# PORTAINER #
+#############
   portainer:
     image: portainer/portainer-ce
     container_name: mgnt-portainer
@@ -44,9 +91,9 @@ services:
       #- ${UPDATE_ON}
       - com.centurylinklabs.watchtower.enable=true
 
-  # ==============
-  # = WATCHTOWER =
-  # ==============
+##############
+# WATCHTOWER #
+##############
   watchtower:
     image: containrrr/watchtower
     container_name: mgnt-watchtower
@@ -82,3 +129,7 @@ services:
     labels:
      # - ${UPDATE_ON}
       - com.centurylinklabs.watchtower.enable=true
+
+networks:
+  mainLan:
+    external: true

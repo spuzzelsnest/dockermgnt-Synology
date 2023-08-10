@@ -6,18 +6,25 @@ A stack I use on my Synology NAS, running piHole, unifi-Controller, Portainer.
 - git clone the repository 
 - Copy the .env-example to .env
 - Edit the .env file to your likes
-- Create Docker Network
+- Configure Network
 
-### Create Network
 
-Docker "mainLan" network creation with macvlan.
+### Configure Network
 
-```
-docker network create --driver macvlan --subnet [IPADDRESS]/[CIDR} --gateway [IPADDRESS] --opt parent=eth0 mainLan
+Running macvlan gives you the option to host containers on your local subnet. However the network interface where the network will be hosted on needs to be set to promiscuous mode.
 
 ```
+sudo ip link set eth0 promisc on 
 
+```
 
+If you prefer to have the network created through the docker-compose file, you can uncomment that config.
+If a docker network is created externally. This is done so:
+
+```
+docker network create -d macvlan --subnet 192.168.1.0/24 --gateway 192.168.1.1 -o parent=eth0 --aux-address="host:192.168.1.XX" mainLan
+
+```
 
 
 ### Run the script

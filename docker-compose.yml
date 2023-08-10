@@ -11,10 +11,10 @@ services:
     restart: ${RESTART_POLICY}
     env_file: .env
     volumes:
-       - ./pihole/etc-pihole:/etc/pihole
-       - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+      - ./data/pihole/etc-pihole:/etc/pihole
+      - ./data/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
     cap_add:
-       - NET_ADMIN
+      - NET_ADMIN
     dns:
       - ${DNS01}
       - ${DNS02}
@@ -26,27 +26,28 @@ services:
       - WEBPASSWORD=${PIHOLE_PASS}
       - TZ= ${TZ}
       - mac-address=${PIHOLE_MAC}
-    network_mode: mainLan
+    networks:
+      - mainLan
 
 ####################
 # UNIFI CONTROLLER #
 ####################
-  uniCon:
-    image: lscr.io/linuxserver/unifi-controller:latest
-    container_name: uniCon
-    restart: always
-    env_file: .env
-    environment:
-      - TZ=${TZ}
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - MEM_LIMIT=1024 #optional
-      - MEM_STARTUP=1024 #optional
-    volumes:
-      - /unifi_data/config:/config
-    networks:
-      mainLan:
-        ipv4_address: ${UNIFI_IP}
+#  uniCon:
+#    image: lscr.io/linuxserver/unifi-controller:latest
+#    container_name: uniCon
+#    restart: always
+#    env_file: .env
+#    environment:
+#      - TZ=${TZ}
+#      - PUID=${PUID}
+#      - PGID=${PGID}
+#      - MEM_LIMIT=1024 #optional
+#      - MEM_STARTUP=1024 #optional
+#    volumes:
+#      - ./data/unifi_data/config:/config
+#    networks:
+#      mainLan:
+#        ipv4_address: ${UNIFI_IP}
 
 ############
 # HEIMDALL #
@@ -59,7 +60,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_PATH}/heimdall:/config
+      - ./data/heimdall:/config
     ports:
       - ${HEIMDALL_PORT}:80
       - ${HEIMDALL_PORT_SSL}:443
@@ -70,7 +71,9 @@ services:
     labels:
      # - ${UPDATE_ON}
       - com.centurylinklabs.watchtower.enable=true
- 
+    networks:
+      - locMgnt
+
 #############
 # PORTAINER #
 #############
@@ -79,7 +82,7 @@ services:
     container_name: mgnt-portainer
     volumes:
       - ${DOCKER_SOCKET}:/var/run/docker.sock
-      - ${PORTAINER_DATA}:/data
+      - ./data/portainer:/data
     ports:
       - ${PORTAINER_PORT_UI}:9000
       - ${PORTAINER_PORT_SSL}:8000
@@ -90,6 +93,8 @@ services:
     labels:
       #- ${UPDATE_ON}
       - com.centurylinklabs.watchtower.enable=true
+    networks:
+      - locMgnt
 
 ##############
 # WATCHTOWER #
@@ -129,7 +134,25 @@ services:
     labels:
      # - ${UPDATE_ON}
       - com.centurylinklabs.watchtower.enable=true
+    networks:
+      - locMgnt
+
+volumes:
+  data:
 
 networks:
+  locMgnt:
+    driver: bridge
+
   mainLan:
+# If network gets created by docker compose
+#    name: mainLan
+#    driver: macvlan
+#    driver_opts:
+#      parent: ${NET_INT}
+#    ipam:
+#      config:
+#        - subnet: ${IP_SUB}
+#          gateway: ${IP_GAT}
+# If network is created externally 
     external: true

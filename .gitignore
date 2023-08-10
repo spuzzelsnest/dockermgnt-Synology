@@ -1,2 +1,6 @@
 # Prerequisites
 .env
+
+# Data dir for conf files
+
+data/

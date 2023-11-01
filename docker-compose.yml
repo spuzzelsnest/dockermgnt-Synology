@@ -105,13 +105,13 @@ networks:
 
   mainLan:
 # If network gets created by docker compose
-#    name: mainLan
-#    driver: macvlan
-#    driver_opts:
-#      parent: ${NET_INT}
-#    ipam:
-#      config:
-#        - subnet: ${IP_SUB}
-#          gateway: ${IP_GAT}
+    name: mainLan
+    driver: macvlan
+    driver_opts:
+      parent: ${NET_INT}
+    ipam:
+      config:
+        - subnet: ${IP_SUB}
+          gateway: ${IP_GAT}
 # If network is created externally 
-    external: true
+#    external: true

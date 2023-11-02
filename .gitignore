@@ -1,6 +1,6 @@
 # Prerequisites
 .env
-
+init-mongo.js
 # Data dir for conf files
 
 data/

@@ -5,7 +5,7 @@ services:
 # PI-HOLE #
 ###########
   pihole:
-    container_name: pihole
+    container_name: mgnt-pihole
     hostname: dckvm-piHole
     image: pihole/pihole:latest
     restart: ${RESTART_POLICY}
@@ -28,26 +28,54 @@ services:
       - mac-address=${PIHOLE_MAC}
     networks:
       - mainLan
+############
+# UNIFI DB #
+############
+  mgnt-mongo:
+    image: docker.io/mongo:4.0
+    container_name: mgnt-mongo
+    hostname: dckvm-mongo
+    volumes:
+      - ./data/unifi/db:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    restart: ${RESTART_POLICY}
 
 ####################
 # UNIFI CONTROLLER #
 ####################
-#  uniCon:
-#    image: lscr.io/linuxserver/unifi-controller:latest
-#    container_name: uniCon
-#    restart: always
-#    env_file: .env
-#    environment:
-#      - TZ=${TZ}
-#      - PUID=${PUID}
-#      - PGID=${PGID}
-#      - MEM_LIMIT=1024 #optional
-#      - MEM_STARTUP=1024 #optional
-#    volumes:
-#      - ./data/unifi_data/config:/config
-#    networks:
-#      mainLan:
-#        ipv4_address: ${UNIFI_IP}
+  uniCon:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: mgnt-unifi
+    env_file: .env
+    environment:
+      - PUID=${PUID}
+      - PGID=${PUID}
+      - TZ=${TZ}
+      - MONGO_USER=${DB_USER}
+      - MONGO_PASS=${DB_PASS}
+      - MONGO_HOST=${DB_HOST}
+      - MONGO_PORT=27017
+      - MONGO_DBNAME=${DB_NAME}
+      - MEM_LIMIT=1024 #optional
+      - MEM_STARTUP=1024 #optional
+      - MONGO_TLS= #optional
+      - MONGO_AUTHSOURCE= #optional
+    volumes:
+      - ./data/unifi:/config
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    restart: ${RESTART_POLICY}
+    networks:
+      mainLan:
+        ipv4_address: ${UNIFI_IP}
 
 ############
 # HEIMDALL #
@@ -68,9 +96,6 @@ services:
       - ${HEIMDALL_PORT}
       - ${HEIMDALL_PORT_SSL}
     restart: ${RESTART_POLICY}
-    labels:
-     # - ${UPDATE_ON}
-      - com.centurylinklabs.watchtower.enable=true
     networks:
       - locMgnt
 
@@ -90,9 +115,6 @@ services:
       - ${PORTAINER_PORT_UI}
       - ${PORTAINER_PORT_SSL}
     restart: ${RESTART_POLICY}
-    labels:
-      #- ${UPDATE_ON}
-      - com.centurylinklabs.watchtower.enable=true
     networks:
       - locMgnt
 
@@ -102,7 +124,6 @@ volumes:
 networks:
   locMgnt:
     driver: bridge
-
   mainLan:
 # If network gets created by docker compose
     name: mainLan

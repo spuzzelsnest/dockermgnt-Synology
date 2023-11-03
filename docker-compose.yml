@@ -5,9 +5,10 @@ services:
 # PI-HOLE #
 ###########
   pihole:
+    image: pihole/pihole:latest
     container_name: mgnt-pihole
     hostname: dckvm-piHole
-    image: pihole/pihole:latest
+    restart: ${RESTART_POLICY}
     env_file: .env
     volumes:
       - ./data/pihole/etc-pihole:/etc/pihole
@@ -25,26 +26,8 @@ services:
       - WEBPASSWORD=${PIHOLE_PASS}
       - TZ= ${TZ}
       - mac-address=${PIHOLE_MAC}
-    restart: ${RESTART_POLICY}
     networks:
       - mainLan
-
-############
-# UNIFI DB #
-############
-  mgnt-mongo:
-    image: docker.io/mongo:4.0
-    container_name: mgnt-mongo
-    hostname: dckvm-mongo
-    ports:
-      - 27017:27017
-    volumes:
-      - ./data/unifi/db:/data/db
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-    restart: ${RESTART_POLICY}
-    networks:
-      - locMgnt
-
 
 ####################
 # UNIFI CONTROLLER #
@@ -52,6 +35,10 @@ services:
   mgnt-unifi:
     image: lscr.io/linuxserver/unifi-network-application:latest
     container_name: mgnt-unifi
+    restart: ${RESTART_POLICY}
+    depends_on:
+      mgnt-mongo:
+        condition: service_healthy
     env_file: .env
     environment:
       - PUID=${PUID}
@@ -64,8 +51,6 @@ services:
       - MONGO_DBNAME=${DB_NAME}
       - MEM_LIMIT=1024 #optional
       - MEM_STARTUP=1024 #optional
-      - MONGO_TLS= #optional
-      - MONGO_AUTHSOURCE= #optional
     volumes:
       - ./data/unifi:/config
     ports:
@@ -78,10 +63,31 @@ services:
       - 8880:8880 #optional
       - 6789:6789 #optional
       - 5514:5514/udp #optional
-    restart: ${RESTART_POLICY}
     networks:
       mainLan:
         ipv4_address: ${UNIFI_IP}
+
+############
+# UNIFI DB #
+############
+  mgnt-mongo:
+    image: docker.io/mongo:4.0
+    container_name: mgnt-mongo
+    restart: ${RESTART_POLICY}
+    volumes:
+      - ./data/unifi/db:/data/db
+      - ./data/unifi/dbcfg:/data/configdb
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - 27017:27017
+    networks:
+      - locMgnt
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
 
 ############
 # HEIMDALL #
@@ -89,6 +95,7 @@ services:
   heimdall:
     image: linuxserver/heimdall
     container_name: mgnt-heimdall
+    restart: ${RESTART_POLICY}
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -101,7 +108,6 @@ services:
     expose:
       - ${HEIMDALL_PORT}
       - ${HEIMDALL_PORT_SSL}
-    restart: ${RESTART_POLICY}
     networks:
       - locMgnt
 
@@ -111,6 +117,7 @@ services:
   portainer:
     image: portainer/portainer-ce
     container_name: mgnt-portainer
+    restart: ${RESTART_POLICY}
     volumes:
       - ${DOCKER_SOCKET}:/var/run/docker.sock
       - ./data/portainer:/data
@@ -120,7 +127,6 @@ services:
     expose:
       - ${PORTAINER_PORT_UI}
       - ${PORTAINER_PORT_SSL}
-    restart: ${RESTART_POLICY}
     networks:
       - locMgnt
 

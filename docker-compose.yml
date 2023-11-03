@@ -8,7 +8,6 @@ services:
     container_name: mgnt-pihole
     hostname: dckvm-piHole
     image: pihole/pihole:latest
-    restart: ${RESTART_POLICY}
     env_file: .env
     volumes:
       - ./data/pihole/etc-pihole:/etc/pihole
@@ -26,8 +25,10 @@ services:
       - WEBPASSWORD=${PIHOLE_PASS}
       - TZ= ${TZ}
       - mac-address=${PIHOLE_MAC}
+    restart: ${RESTART_POLICY}
     networks:
       - mainLan
+
 ############
 # UNIFI DB #
 ############
@@ -35,15 +36,20 @@ services:
     image: docker.io/mongo:4.0
     container_name: mgnt-mongo
     hostname: dckvm-mongo
+    ports:
+      - 27017:27017
     volumes:
       - ./data/unifi/db:/data/db
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     restart: ${RESTART_POLICY}
+    networks:
+      - locMgnt
+
 
 ####################
 # UNIFI CONTROLLER #
 ####################
-  uniCon:
+  mgnt-unifi:
     image: lscr.io/linuxserver/unifi-network-application:latest
     container_name: mgnt-unifi
     env_file: .env
@@ -53,7 +59,7 @@ services:
       - TZ=${TZ}
       - MONGO_USER=${DB_USER}
       - MONGO_PASS=${DB_PASS}
-      - MONGO_HOST=${DB_HOST}
+      - MONGO_HOST=mgnt-mongo
       - MONGO_PORT=27017
       - MONGO_DBNAME=${DB_NAME}
       - MEM_LIMIT=1024 #optional

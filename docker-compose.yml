@@ -42,7 +42,7 @@ services:
     env_file: .env
     environment:
       - PUID=${PUID}
-      - PGID=${PUID}
+      - PGID=${PGID}
       - TZ=${TZ}
       - MONGO_USER=${DB_USER}
       - MONGO_PASS=${DB_PASS}

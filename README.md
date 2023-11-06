@@ -33,3 +33,13 @@ docker network create -d macvlan --subnet 192.168.1.0/24 --gateway 192.168.1.1 -
 docker-compose up -d
 
 ```
+
+Copy the and adapt the .env file
+
+```
+cp .env-example .env
+
+```
+
+
+Copy the init.

@@ -36,9 +36,6 @@ services:
     image: lscr.io/linuxserver/unifi-network-application:latest
     container_name: mgnt-unifi
     restart: ${RESTART_POLICY}
-    depends_on:
-      mgnt-mongo:
-        condition: service_healthy
     env_file: .env
     environment:
       - PUID=${PUID}
@@ -51,6 +48,8 @@ services:
       - MONGO_DBNAME=${DB_NAME}
       - MEM_LIMIT=1024 #optional
       - MEM_STARTUP=1024 #optional
+      - MONGO_TLS=false #optional
+      - MONGO_AUTHSOURCE=admin #optional
     volumes:
       - ./data/unifi:/config
     ports:
@@ -66,6 +65,9 @@ services:
     networks:
       mainLan:
         ipv4_address: ${UNIFI_IP}
+    depends_on:
+      - mgnt-mongo
+#        condition: service_healthy
 
 ############
 # UNIFI DB #
@@ -74,42 +76,17 @@ services:
     image: docker.io/mongo:4.0
     container_name: mgnt-mongo
     restart: ${RESTART_POLICY}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
-      - ./data/unifi/db:/data/db
-      - ./data/unifi/dbcfg:/data/configdb
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     ports:
       - 27017:27017
     networks:
-      - locMgnt
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
-
-############
-# HEIMDALL #
-############
-  heimdall:
-    image: linuxserver/heimdall
-    container_name: mgnt-heimdall
-    restart: ${RESTART_POLICY}
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ./data/heimdall:/config
-    ports:
-      - ${HEIMDALL_PORT}:80
-      - ${HEIMDALL_PORT_SSL}:443
-    expose:
-      - ${HEIMDALL_PORT}
-      - ${HEIMDALL_PORT_SSL}
-    networks:
-      - locMgnt
+      mainLan:
+        ipv4_address: ${DB_IP}
 
 #############
 # PORTAINER #

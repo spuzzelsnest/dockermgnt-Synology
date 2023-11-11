@@ -29,17 +29,26 @@ docker network create -d macvlan --subnet 192.168.1.0/24 --gateway 192.168.1.1 -
 
 ### Run the script
 
-```
-docker-compose up -d
-
-```
-
-Copy the and adapt the .env file
-
+Copy and make necessary changes to the .env file
 ```
 cp .env-example .env
 
 ```
 
+Copy and make necessary changes to the init-mongo-EXAMPLE.js 
+```
+cp init-mongo-EXAMPLE.js init-mongo.js
 
-Copy the init.
+```
+
+Run docker-compose
+```
+docker-compose up -d
+
+```
+
+### Troubleshooting
+
+Running portainer will allow you to read container log files more easily.
+
+check that the connection between unifi and the mongo container is working fine.

@@ -88,6 +88,28 @@ services:
       mainLan:
         ipv4_address: ${DB_IP}
 
+############
+# MARIA DB #
+############
+  mgnt-maria:
+#    image: mariadb:10.6.4
+    image: jsurf/rpi-mariadb:latest #ARM Version
+    container_name: mgnt-maria
+    restart: ${RESTART_POLICY}
+    environment:
+      - TZ= ${TZ}
+      - MYSQL_ROOT_PASSWORD=${OBSERVIUM_ADMIN_PASS}
+      - MYSQL_USER=${OBSERVIUM_DB_USER}
+      - MYSQL_PASSWORD=${OBSERVIUM_DB_PASS}
+      - MYSQL_DATABASE=${OBSERVIUM_DB_NAME}
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      mainLan:
+        ipv4_address: ${MARIADB_IP}
+
 #############
 # PORTAINER #
 #############
@@ -111,14 +133,15 @@ services:
 # OBSERVIUM #
 #############
   mgnt-observium:
-    image: mbixtech/observium:21.10
+#    image: mbixtech/observium:21.10
+    image: mbixtech/arm32v7-observium:latest # ARM Version
     container_name: mgnt-observium
     restart: ${RESTART_POLICY}
     environment:
       - TZ= ${TZ}
       - OBSERVIUM_ADMIN_USER=${OBSERVIUM_ADMIN_USER}
       - OBSERVIUM_ADMIN_PASS=${OBSERVIUM_ADMIN_PASS}
-      - OBSERVIUM_DB_HOST=${OBSERVIUM_DB_HOST}
+      - OBSERVIUM_DB_HOST=mgnt-maria
       - OBSERVIUM_DB_NAME=${OBSERVIUM_DB_NAME}
       - OBSERVIUM_DB_USER=${OBSERVIUM_DB_USER}
       - OBSERVIUM_DB_PASS=${OBSERVIUM_DB_PASS}
@@ -126,12 +149,15 @@ services:
     volumes:
       - ./data/observium/logs:/opt/observium/logs
       - ./data/observium/rrd:/opt/observium/rrd
+#    networks:
+#      - locMgnt
     networks:
-      - locMgnt
+      mainLan:
+        ipv4_address: ${OBSERVIUM_IP}
     ports:
       - ${OBSERVIUM_PORT}:80
     depends_on:
-      - mgnt-mongo
+      - mgnt-maria
 
 volumes:
   data:

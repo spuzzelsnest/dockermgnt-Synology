@@ -127,11 +127,11 @@ services:
       - ./data/observium/logs:/opt/observium/logs
       - ./data/observium/rrd:/opt/observium/rrd
     networks:
-      mainLa
-        ipv4_address: ${UNIFI_IP}
-      - mainLan
+      mainLan:
+        ipv4_address: ${OBSERVIUM_IP}
+
     ports:
-      - ${OBSERVIUM_PORT}:80"
+      - ${OBSERVIUM_PORT}:80
     depends_on:
       - mgnt-mongo
 

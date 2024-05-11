@@ -47,6 +47,17 @@ docker-compose up -d
 
 ```
 
+### Setup of Observium
+
+Create the user for the initial setup 
+
+```
+docker exec -it mgnt-observium bash
+
+./adduser.php <username> <password> <level>
+
+```
+
 ### Troubleshooting
 
 Running portainer will allow you to read container log files more easily.

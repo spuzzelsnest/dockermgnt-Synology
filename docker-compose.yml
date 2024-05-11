@@ -127,9 +127,7 @@ services:
       - ./data/observium/logs:/opt/observium/logs
       - ./data/observium/rrd:/opt/observium/rrd
     networks:
-      mainLan:
-        ipv4_address: ${OBSERVIUM_IP}
-
+      - locMgnt
     ports:
       - ${OBSERVIUM_PORT}:80
     depends_on:

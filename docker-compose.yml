@@ -70,7 +70,7 @@ services:
 #        condition: service_healthy
 
 ############
-# UNIFI DB #
+# MONGO DB #
 ############
   mgnt-mongo:
     image: docker.io/mongo:4.0
@@ -81,7 +81,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
       MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     ports:
       - 27017:27017
     networks:
@@ -106,6 +106,34 @@ services:
       - ${PORTAINER_PORT_SSL}
     networks:
       - locMgnt
+
+#############
+# OBSERVIUM #
+#############
+  mgnt-observium:
+    image: mbixtech/observium:21.10
+    container_name: mgnt-observium
+    restart: ${RESTART_POLICY}
+    environment:
+      - TZ= ${TZ}
+      - OBSERVIUM_ADMIN_USER=${OBSERVIUM_ADMIN_USER}
+      - OBSERVIUM_ADMIN_PASS=${OBSERVIUM_ADMIN_PASS}
+      - OBSERVIUM_DB_HOST=${OBSERVIUM_DB_HOST}
+      - OBSERVIUM_DB_NAME=${OBSERVIUM_DB_NAME}
+      - OBSERVIUM_DB_USER=${OBSERVIUM_DB_USER}
+      - OBSERVIUM_DB_PASS=${OBSERVIUM_DB_PASS}
+      - OBSERVIUM_BASE_URL=${OBSERVIUM_BASE_URL}
+    volumes:
+      - ./data/observium/logs:/opt/observium/logs
+      - ./data/observium/rrd:/opt/observium/rrd
+    networks:
+      mainLa
+        ipv4_address: ${UNIFI_IP}
+      - mainLan
+    ports:
+      - ${OBSERVIUM_PORT}:80"
+    depends_on:
+      - mgnt-mongo
 
 volumes:
   data:

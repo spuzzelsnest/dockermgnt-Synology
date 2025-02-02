@@ -67,7 +67,7 @@ services:
         ipv4_address: ${UNIFI_IP}
     depends_on:
       - mgnt-mongo
-#        condition: service_healthy
+        condition: service_healthy
 
 ############
 # MONGO DB #

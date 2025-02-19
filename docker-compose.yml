@@ -32,61 +32,61 @@ services:
 ####################
 # UNIFI CONTROLLER #
 ####################
-#  mgnt-unifi:
-#    image: lscr.io/linuxserver/unifi-network-application:latest
-#    container_name: mgnt-unifi
-#    restart: ${RESTART_POLICY}
-#    env_file: .env
-#    environment:
-#      - PUID=${PUID}
-#      - PGID=${PGID}
-#      - TZ=${TZ}
-#      - MONGO_USER=${DB_USER}
-#      - MONGO_PASS=${DB_PASS}
-#      - MONGO_HOST=mgnt-mongo
-#      - MONGO_PORT=27017
-#      - MONGO_DBNAME=${DB_NAME}
-#      - MEM_LIMIT=1024 #optional
-#      - MEM_STARTUP=1024 #optional
-#      - MONGO_TLS=false #optional
-#      - MONGO_AUTHSOURCE=admin #optional
-#    volumes:
-#      - ./data/unifi:/config
-#    ports:
-#      - 8443:8443
-#      - 3478:3478/udp
-#      - 10001:10001/udp
-#      - 8080:8080
-#      - 1900:1900/udp #optional
-#      - 8843:8843 #optional
-#      - 8880:8880 #optional
-#      - 6789:6789 #optional
-#      - 5514:5514/udp #optional
-#    networks:
-#      mainLan:
-#        ipv4_address: ${UNIFI_IP}
-#    depends_on:
-#      - mgnt-mongo
-#        condition: service_healthy
+  mgnt-unifi:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: mgnt-unifi
+    restart: ${RESTART_POLICY}
+    env_file: .env
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MONGO_USER=${DB_USER}
+      - MONGO_PASS=${DB_PASS}
+      - MONGO_HOST=mgnt-mongo
+      - MONGO_PORT=27017
+      - MONGO_DBNAME=${DB_NAME}
+      - MEM_LIMIT=1024 #optional
+      - MEM_STARTUP=1024 #optional
+      - MONGO_TLS=false #optional
+      - MONGO_AUTHSOURCE=admin #optional
+    volumes:
+      - ./data/unifi:/config
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    networks:
+      mainLan:
+        ipv4_address: ${UNIFI_IP}
+    depends_on:
+      - mgnt-mongo
+        condition: service_healthy
 
 ############
 # MONGO DB #
 ############
-#  mgnt-mongo:
-#    image: docker.io/mongo:4.0
-#    container_name: mgnt-mongo
-#    restart: ${RESTART_POLICY}
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-#      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
-#      MONGO_INITDB_DATABASE: ${DB_NAME}
-#    volumes:
-#      - ./init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-#    ports:
-#      - 27017:27017
-#    networks:
-#      mainLan:
-#        ipv4_address: ${DB_IP}
+  mgnt-mongo:
+    image: docker.io/mongo:4.0
+    container_name: mgnt-mongo
+    restart: ${RESTART_POLICY}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+    volumes:
+      - ./init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - 27017:27017
+    networks:
+      mainLan:
+        ipv4_address: ${DB_IP}
 
 ############
 # MARIA DB #

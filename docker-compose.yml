@@ -32,61 +32,61 @@ services:
 ####################
 # UNIFI CONTROLLER #
 ####################
-  mgnt-unifi:
-    image: lscr.io/linuxserver/unifi-network-application:latest
-    container_name: mgnt-unifi
-    restart: ${RESTART_POLICY}
-    env_file: .env
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - MONGO_USER=${DB_USER}
-      - MONGO_PASS=${DB_PASS}
-      - MONGO_HOST=mgnt-mongo
-      - MONGO_PORT=27017
-      - MONGO_DBNAME=${DB_NAME}
-      - MEM_LIMIT=1024 #optional
-      - MEM_STARTUP=1024 #optional
-      - MONGO_TLS=false #optional
-      - MONGO_AUTHSOURCE=admin #optional
-    volumes:
-      - ./data/unifi:/config
-    ports:
-      - 8443:8443
-      - 3478:3478/udp
-      - 10001:10001/udp
-      - 8080:8080
-      - 1900:1900/udp #optional
-      - 8843:8843 #optional
-      - 8880:8880 #optional
-      - 6789:6789 #optional
-      - 5514:5514/udp #optional
-    networks:
-      mainLan:
-        ipv4_address: ${UNIFI_IP}
-    depends_on:
-      - mgnt-mongo
-        condition: service_healthy
+#  mgnt-unifi:
+#    image: lscr.io/linuxserver/unifi-network-application:latest
+#    container_name: mgnt-unifi
+#    restart: ${RESTART_POLICY}
+#    env_file: .env
+#    environment:
+#      - PUID=${PUID}
+#      - PGID=${PGID}
+#      - TZ=${TZ}
+#      - MONGO_USER=${DB_USER}
+#      - MONGO_PASS=${DB_PASS}
+#      - MONGO_HOST=mgnt-mongo
+#      - MONGO_PORT=27017
+#      - MONGO_DBNAME=${DB_NAME}
+#      - MEM_LIMIT=1024 #optional
+#      - MEM_STARTUP=1024 #optional
+#      - MONGO_TLS=false #optional
+#      - MONGO_AUTHSOURCE=admin #optional
+#    volumes:
+#      - ./data/unifi:/config
+#    ports:
+#      - 8443:8443
+#      - 3478:3478/udp
+#      - 10001:10001/udp
+#      - 8080:8080
+#      - 1900:1900/udp #optional
+#      - 8843:8843 #optional
+#      - 8880:8880 #optional
+#      - 6789:6789 #optional
+#      - 5514:5514/udp #optional
+#    networks:
+#      mainLan:
+#        ipv4_address: ${UNIFI_IP}
+#    depends_on:
+#      - mgnt-mongo
+#        condition: service_healthy
 
 ############
 # MONGO DB #
 ############
-  mgnt-mongo:
-    image: docker.io/mongo:4.0
-    container_name: mgnt-mongo
-    restart: ${RESTART_POLICY}
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
-      MONGO_INITDB_DATABASE: ${DB_NAME}
-    volumes:
-      - ./init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-    ports:
-      - 27017:27017
-    networks:
-      mainLan:
-        ipv4_address: ${DB_IP}
+#  mgnt-mongo:
+#    image: docker.io/mongo:4.0
+#    container_name: mgnt-mongo
+#    restart: ${RESTART_POLICY}
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+#      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
+#      MONGO_INITDB_DATABASE: ${DB_NAME}
+#    volumes:
+#      - ./init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+#    ports:
+#      - 27017:27017
+#    networks:
+#      mainLan:
+#        ipv4_address: ${DB_IP}
 
 ############
 # MARIA DB #
@@ -103,7 +103,7 @@ services:
       - MYSQL_PASSWORD=${OBSERVIUM_DB_PASS}
       - MYSQL_DATABASE=${OBSERVIUM_DB_NAME}
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - "./data/mysql:/var/lib/mysql"
     ports:
       - 3306:3306
     networks:
@@ -118,8 +118,8 @@ services:
     container_name: mgnt-portainer
     restart: ${RESTART_POLICY}
     volumes:
-      - ${DOCKER_SOCKET}:/var/run/docker.sock
-      - ./data/portainer:/data
+      - "${DOCKER_SOCKET}:/var/run/docker.sock"
+      - "./data/portainer:/data"
     ports:
       - ${PORTAINER_PORT_UI}:9000
       - ${PORTAINER_PORT_SSL}:8000
@@ -147,8 +147,8 @@ services:
       - OBSERVIUM_DB_PASS=${OBSERVIUM_DB_PASS}
       - OBSERVIUM_BASE_URL=${OBSERVIUM_BASE_URL}
     volumes:
-      - ./data/observium/logs:/opt/observium/logs
-      - ./data/observium/rrd:/opt/observium/rrd
+      - "./data/observium/logs:/opt/observium/logs"
+      - "./data/observium/rrd:/opt/observium/rrd"
 #    networks:
 #      - locMgnt
     networks:
@@ -158,6 +158,30 @@ services:
       - ${OBSERVIUM_PORT}:80
     depends_on:
       - mgnt-maria
+
+#########
+# SNORT #
+#########
+   ids:
+      image: fabriziogaliano/snort-ids:latest
+      container_name: mgnt-snort
+      restart: ${RESTART_POLICY}
+      environment:
+         SNORT_NET: ${SNORT_IP}
+         HOST_INT: ${SNORT_ETH}
+         HOST_NAME: "snort01"
+         PPORK_OINKCODE: "00xxxxxd6934xxxxxxxx4ab1e0d4a7xxxxxxxc6c8"
+         BARN_DBUSER: "snort"
+         BARN_DBNAME: "snorby"
+         BARN_DBPASS: "yourPasswordHere"
+         BARN_DBHOST: "db.host.local"
+      volumes:
+         - "/etc/localtime:/etc/localtime"
+         - "./rules:/etc/snort/rules"
+         - "./log/snort:/var/log/snort"
+         - "./log/barnyard2:/var/log/barnyard2"
+      network_mode: host
+      privileged: false
 
 volumes:
   data:

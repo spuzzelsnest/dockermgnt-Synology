@@ -99,7 +99,7 @@ services:
     volumes:
       - "./data/mysql:/var/lib/mysql"
     environment:
-      - TZ= ${TZ}
+      - TZ=${TZ}
       - MYSQL_ROOT_PASSWORD=${LIBRENMS_ROOT_PASS}
       - MYSQL_USER=${LIBRENMS_DB_USER}
       - MYSQL_PASSWORD=${LIBRENMS_DB_PASS}
@@ -141,7 +141,7 @@ services:
     hostname: dckvm-libreNMS
     restart: ${RESTART_POLICY}
     environment:
-      - TZ= ${TZ}
+      - TZ=${TZ}
       - APP_KEY=${LIBRENMS_API_KEY}
       - DB_HOST=${MYSQL_IP}
       - DB_NAME=${LIBRENMS_DB}
@@ -151,8 +151,8 @@ services:
       - BASE_URL=http://localhost
       - DAILY_ON_STARTUP=true
     volumes:
-      - "./data/logs:/opt/librenms/logs"
-      - "./data/rrd:/opt/librenms/rrd"
+      - "./data/libreNMS/logs:/opt/librenms/logs"
+      - "./data/libreNMS/rrd:/opt/librenms/rrd"
     networks:
       mainLan:
         ipv4_address: ${LIBRENMS_IP}

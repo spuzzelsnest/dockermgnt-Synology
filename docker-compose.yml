@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.9"
 
 services:
 ###########
@@ -88,27 +88,30 @@ services:
 #      mainLan:
 #        ipv4_address: ${DB_IP}
 
-############
-# MARIA DB #
-############
-  mgnt-maria:
-#    image: mariadb:10.6.4
-    image: jsurf/rpi-mariadb:latest #ARM Version
-    container_name: mgnt-maria
-    restart: ${RESTART_POLICY}
-    environment:
-      - TZ= ${TZ}
-      - MYSQL_ROOT_PASSWORD=${OBSERVIUM_ADMIN_PASS}
-      - MYSQL_USER=${OBSERVIUM_DB_USER}
-      - MYSQL_PASSWORD=${OBSERVIUM_DB_PASS}
-      - MYSQL_DATABASE=${OBSERVIUM_DB_NAME}
+##########
+# MYSQL #
+#########
+  mgnt-mysql:
+    image: mysql:8.0
+    command: --sql-mode=""
+    ports:
+      - "3306"
     volumes:
       - "./data/mysql:/var/lib/mysql"
-    ports:
-      - 3306:3306
+    environment:
+      - TZ= ${TZ}
+      - MYSQL_ROOT_PASSWORD=${LIBRENMS_ROOT_PASS}
+      - MYSQL_USER=${LIBRENMS_DB_USER}
+      - MYSQL_PASSWORD=${LIBRENMS_DB_PASS}
+      - MYSQL_DATABASE=${LIBRENMS_DB_NAME}
+    healthcheck:
+      test: "mysql -h localhost -u root -p$$MYSQL_ROOT_PASSWORD -e 'USE librenms'"
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
       mainLan:
-        ipv4_address: ${MARIADB_IP}
+        ipv4_address: ${MYSQL_IP}
 
 #############
 # PORTAINER #
@@ -129,37 +132,37 @@ services:
     networks:
       - locMgnt
 
-#############
-# OBSERVIUM #
-#############
-  mgnt-observium:
-#    image: mbixtech/observium:21.10
-    image: mbixtech/arm32v7-observium:latest # ARM Version
-    container_name: mgnt-observium
+############
+# LIBRENMS #
+############
+  mgnt-librenms:
+    image: librenms/librenms:latest
+    container_name: mgnt-librenms
+    hostname: dckvm-libreNMS
     restart: ${RESTART_POLICY}
     environment:
       - TZ= ${TZ}
-      - OBSERVIUM_ADMIN_USER=${OBSERVIUM_ADMIN_USER}
-      - OBSERVIUM_ADMIN_PASS=${OBSERVIUM_ADMIN_PASS}
-      - OBSERVIUM_DB_HOST=mgnt-maria
-      - OBSERVIUM_DB_NAME=${OBSERVIUM_DB_NAME}
-      - OBSERVIUM_DB_USER=${OBSERVIUM_DB_USER}
-      - OBSERVIUM_DB_PASS=${OBSERVIUM_DB_PASS}
-      - OBSERVIUM_BASE_URL=${OBSERVIUM_BASE_URL}
+      - APP_KEY=${LIBRENMS_API_KEY}
+      - DB_HOST=${MYSQL_IP}
+      - DB_NAME=${LIBRENMS_DB}
+      - DB_USER=${LIBRENMS_USER}
+      - DB_PASS=${LIBRENMS_PASS}
+      - POLLERS=16
+      - BASE_URL=http://localhost
+      - DAILY_ON_STARTUP=true
     volumes:
-      - "./data/observium/logs:/opt/observium/logs"
-      - "./data/observium/rrd:/opt/observium/rrd"
-#    networks:
-#      - locMgnt
+      - "./data/logs:/opt/librenms/logs"
+      - "./data/rrd:/opt/librenms/rrd"
     networks:
       mainLan:
-        ipv4_address: ${OBSERVIUM_IP}
+        ipv4_address: ${LIBRENMS_IP}
     ports:
-      - ${OBSERVIUM_PORT}:80
+      - ${LIBRENMS_PORT}:80
+    links:
+      - mgnt-mysql:db
     depends_on:
-      - mgnt-maria
-
-
+      mgnt-mysql:
+        condition: service_healthy
 
 volumes:
   data:

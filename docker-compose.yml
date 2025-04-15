@@ -154,10 +154,10 @@ services:
       - APP_KEY=${LIBRENMS_API_KEY}
       - DB_HOST=${MYSQL_IP}
       - DB_NAME=${LIBRENMS_DB}
-      - DB_USER=${LIBRENMS_USER}
-      - DB_PASS=${LIBRENMS_PASS}
+      - DB_USER=${LIBRENMS_DB_USER}
+      - DB_PASS=${LIBRENMS_DB_PASS}
       - POLLERS=16
-      - BASE_URL=http://localhost
+      - BASE_URL=${LIBRENMS_BASE_URL}
       - DAILY_ON_STARTUP=true
     volumes:
       - "./data/libreNMS/logs:/opt/librenms/logs"

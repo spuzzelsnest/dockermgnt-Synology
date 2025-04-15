@@ -1,5 +1,5 @@
 # dockermgnt
-A stack I use on my Synology NAS, running piHole, unifi-Controller, Portainer.
+A stack I use on my Synology NAS, running piHole, unifi-Controller, Portainer, LibreNMS
 
 ## How It works
 
@@ -47,16 +47,6 @@ docker-compose up -d
 
 ```
 
-### Setup of Observium
-
-Create the user for the initial setup 
-
-```
-docker exec -it mgnt-observium bash
-
-./adduser.php <username> <password> <level>
-
-```
 
 ### Troubleshooting
 

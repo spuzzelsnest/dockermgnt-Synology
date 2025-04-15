@@ -70,7 +70,7 @@ services:
       mainLan:
         ipv4_address: ${UNIFI_IP}
     depends_on:
-      mgnt-mongo
+      mgnt-mongo:
         condition: service_healthy
 
 ############

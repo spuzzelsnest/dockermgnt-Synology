@@ -84,9 +84,9 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${DB_ADMIN_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${DB_ADMIN_PASS}
-      - MONGO_INITDB_DATABASE=${UNIFI_DB_ADMIN}
-      - MONG_USER=${UNIFI_DB_USER}  
-      - MONGO_PASS=${UNIFI_DB_PASS}  
+      - MONGO_INITDB_DATABASE=${DB_ADMIN_USER}
+      - MONG_USER=${UNIFI_DB_USER}
+      - MONGO_PASS=${UNIFI_DB_PASS}
       - MONGO_DB=${UNIFI_DB_NAME}
       - MONGO_AUTHSOURCE=${DB_ADMIN_USER}
     volumes:
@@ -95,7 +95,7 @@ services:
       - 27017:27017
     networks:
       mainLan:
-        ipv4_address: ${DB_IP}
+        ipv4_address: ${MONGODB_IP}
 
 ##########
 # MYSQL #

@@ -153,7 +153,7 @@ services:
       - TZ=${TZ}
       - APP_KEY=${LIBRENMS_API_KEY}
       - DB_HOST=${MYSQL_IP}
-      - DB_NAME=${LIBRENMS_DB}
+      - DB_NAME=${LIBRENMS_DB_HOST}
       - DB_USER=${LIBRENMS_DB_USER}
       - DB_PASS=${LIBRENMS_DB_PASS}
       - POLLERS=16

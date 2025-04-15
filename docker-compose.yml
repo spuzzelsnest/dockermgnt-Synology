@@ -45,11 +45,11 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - MONGO_USER=${DB_USER}
-      - MONGO_PASS=${DB_PASS}
+      - MONGO_USER=${UNIFI_DB_USER}
+      - MONGO_PASS=${UNIFI_DB_PASS}
       - MONGO_HOST=mgnt-mongo
       - MONGO_PORT=27017
-      - MONGO_DBNAME=${DB_NAME}
+      - MONGO_DBNAME=${UNIFI_DB_NAME}
       - MEM_LIMIT=1024 #optional
       - MEM_STARTUP=1024 #optional
       - MONGO_TLS=false #optional
@@ -84,11 +84,11 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${DB_ADMIN_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${DB_ADMIN_PASS}
-      - MONGO_INITDB_DATABASE=${DB_ADMIN}
-      - MONG_USER=${DB_USER}  
-      - MONGO_PASS=${DB_PASS}  
-      - MONGO_DB=${DB_NAME}
-      - MONGO_AUTHSOURCE=${DB_ADMIN}
+      - MONGO_INITDB_DATABASE=${UNIFI_DB_ADMIN}
+      - MONG_USER=${UNIFI_DB_USER}  
+      - MONGO_PASS=${UNIFI_DB_PASS}  
+      - MONGO_DB=${UNIFI_DB_NAME}
+      - MONGO_AUTHSOURCE=${DB_ADMIN_USER}
     volumes:
       - "./init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro"
     ports:

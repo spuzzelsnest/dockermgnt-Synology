@@ -13,7 +13,7 @@ opkg insetall docker-compose dockerd macvlan
 
 - git clone the repository
 ```
-git clone --branch armc32v6 https://github.com/spuzzelsnest/dockermgnt-Synology.git mgnt/
+git clone --branch arm32v6 https://github.com/spuzzelsnest/dockermgnt-Synology.git mgnt/
 
 ```
 - Change the directory and copy the .env-example to .env

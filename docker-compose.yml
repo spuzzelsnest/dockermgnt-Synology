@@ -22,7 +22,7 @@ services:
 # PI-HOLE #
 ###########
   pihole:
-    image: pihole/pihole:4.3.2
+    image: pihole/pihole:v5.5
     container_name: mgnt-pihole
     hostname: dckvm-piHole
     restart: ${RESTART_POLICY}

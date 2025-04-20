@@ -1,127 +1,4 @@
 services:
-###########
-# PI-HOLE #
-###########
-  pihole:
-    image: pihole/pihole:latest
-    container_name: mgnt-pihole
-    hostname: dckvm-piHole
-    restart: ${RESTART_POLICY}
-    env_file: .env
-    volumes:
-      - "./data/pihole/etc-pihole:/etc/pihole"
-      - "./data/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
-      - "./init/resolv.conf:/etc/resolv.conf"
-    ports:
-      - "53:53/tcp"
-      - "10.72.72.2:53:53/udp"
-      - "81:80/tcp"
-      - "443:443/tcp"
-    cap_add:
-      - NET_ADMIN
-    dns:
-      - ${DNS01}
-      - ${DNS02}
-    environment:
-      - DNS1=${DNS01}
-      - DNS2=${DNS02}
-      - ServerIP=${PIHOLE_IP}
-      - DNSMASQ_LISTENING=all
-      - WEBPASSWORD=${PIHOLE_PASS}
-      - TZ= ${TZ}
-      - mac-address=${PIHOLE_MAC}
-    networks:
-      - mainLan
-
-####################
-# UNIFI CONTROLLER #
-####################
-  mgnt-unifi:
-    image: lscr.io/linuxserver/unifi-network-application:latest
-    container_name: mgnt-unifi
-    restart: ${RESTART_POLICY}
-    env_file: .env
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - MONGO_USER=${UNIFI_DB_USER}
-      - MONGO_PASS=${UNIFI_DB_PASS}
-      - MONGO_HOST=mgnt-mongo
-      - MONGO_PORT=27017
-      - MONGO_DBNAME=${UNIFI_DB_NAME}
-      - MEM_LIMIT=1024 #optional
-      - MEM_STARTUP=1024 #optional
-      - MONGO_TLS=false #optional
-      - MONGO_AUTHSOURCE=admin #optional
-    volumes:
-      - "./data/unifi:/config"
-    ports:
-      - 8443:8443
-      - 3478:3478/udp
-      - 10001:10001/udp
-      - 8080:8080
-      - 1900:1900/udp #optional
-      - 8843:8843 #optional
-      - 8880:8880 #optional
-      - 6789:6789 #optional
-      - 5514:5514/udp #optional
-    networks:
-      mainLan:
-        ipv4_address: ${UNIFI_IP}
-    depends_on:
-      mgnt-mongo:
-        condition: service_healthy
-
-############
-# MONGO DB #
-############
-  mgnt-mongo:
-    image: docker.io/mongo:4.0
-    container_name: mgnt-mongo
-    restart: ${RESTART_POLICY}
-    env_file: .env
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${DB_ADMIN_USER}
-      - MONGO_INITDB_ROOT_PASSWORD=${DB_ADMIN_PASS}
-      - MONGO_INITDB_DATABASE=${DB_ADMIN_USER}
-      - MONG_USER=${UNIFI_DB_USER}
-      - MONGO_PASS=${UNIFI_DB_PASS}
-      - MONGO_DB=${UNIFI_DB_NAME}
-      - MONGO_AUTHSOURCE=${DB_ADMIN_USER}
-    volumes:
-      - "./init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro"
-    ports:
-      - 27017:27017
-    networks:
-      mainLan:
-        ipv4_address: ${MONGODB_IP}
-
-##########
-# MYSQL #
-#########
-  mgnt-mysql:
-    image: mysql:8.0
-    command: --sql-mode=""
-    ports:
-      - "3306"
-    volumes:
-      - "./data/mysql:/var/lib/mysql"
-    environment:
-      - TZ=${TZ}
-      - MYSQL_ROOT_PASSWORD=${LIBRENMS_ROOT_PASS}
-      - MYSQL_USER=${LIBRENMS_DB_USER}
-      - MYSQL_PASSWORD=${LIBRENMS_DB_PASS}
-      - MYSQL_DATABASE=${LIBRENMS_DB_NAME}
-    healthcheck:
-      test: "mysql -h localhost -u root -p$$MYSQL_ROOT_PASSWORD -e 'USE librenms'"
-      interval: 5s
-      timeout: 5s
-      retries: 20
-    networks:
-      mainLan:
-        ipv4_address: ${MYSQL_IP}
-
 #############
 # PORTAINER #
 #############
@@ -140,37 +17,38 @@ services:
       - ${PORTAINER_PORT_SSL}
     networks:
       - locMgnt
- 
-############
-# LIBRENMS #
-############
-  mgnt-librenms:
-    image: librenms/librenms:latest
-    container_name: mgnt-librenms
-    hostname: dckvm-libreNMS
+
+####################
+# UNIFI CONTROLLER #
+####################
+  mgnt-unifi:
+    image: linuxserver/unifi-controller:arm32v6-latest
+    container_name: mgnt-unifi
     restart: ${RESTART_POLICY}
+    env_file: .env
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - TZ=${TZ}
-      - APP_KEY=${LIBRENMS_API_KEY}
-      - DB_HOST=${MYSQL_IP}
-      - DB_NAME=${LIBRENMS_DB_HOST}
-      - DB_USER=${LIBRENMS_DB_USER}
-      - DB_PASS=${LIBRENMS_DB_PASS}
-      - POLLERS=16
-      - BASE_URL=${LIBRENMS_BASE_URL}
-      - DAILY_ON_STARTUP=true
+      - MEM_LIMIT=1024 #optional
+      - MEM_STARTUP=1024 #optional
     volumes:
-      - "./data/libreNMS/logs:/opt/librenms/logs"
-      - "./data/libreNMS/rrd:/opt/librenms/rrd"
+      - "./data/unifi:/config"
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
     networks:
       mainLan:
-        ipv4_address: ${LIBRENMS_IP}
-    ports:
-      - ${LIBRENMS_PORT}:80
-    links:
-      - mgnt-mysql:db
+        ipv4_address: ${UNIFI_IP}
     depends_on:
-      mgnt-mysql:
+      mgnt-mongo:
         condition: service_healthy
 
 volumes:

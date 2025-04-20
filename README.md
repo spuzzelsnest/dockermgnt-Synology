@@ -1,31 +1,37 @@
 # dockermgnt
-A stack I use on my Synology NAS, running piHole, unifi-Controller, Portainer, LibreNMS
+As is was thinkering with some old hardware (Check Point L-50 Firewall) running openWRT, I created this branch with support for ARM32v6. This adds Portainer, the unifi-Controller.
 
+## Prerequisits
+
+In order to have the docker network running, macvlan is needed. This gives you the option to host containers on your local subnet. However the network interface where the network will be hosted on needs to be set to promiscuous mode.
+
+```
+opkg insetall docker-compose dockerd macvlan
+
+```
 ## How It works
 
-- git clone the repository 
-- Copy the .env-example to .env
+- git clone the repository
+```
+git clone --branch armc32v6 https://github.com/spuzzelsnest/dockermgnt-Synology.git mgnt/
+
+```
+- Change the directory and copy the .env-example to .env
+```
+cd mgnt && cp .env-example .env
+
+```
 - Edit the .env file to your likes
-- Configure Network
 
-
-### Configure Network
-
-Running macvlan gives you the option to host containers on your local subnet. However the network interface where the network will be hosted on needs to be set to promiscuous mode.
-
-```
-sudo ip link set eth0 promisc on 
-
-```
+### Network
 
 If you prefer to have the network created through the docker-compose file, you can uncomment that config.
-If a docker network is created externally. This is done so:
+If a docker network is created externally. This is done so with the following syntacs:
 
 ```
 docker network create -d macvlan --subnet 192.168.1.0/24 --gateway 192.168.1.1 -o parent=eth0 --aux-address="host:192.168.1.XX" mainLan
 
 ```
-
 
 ### Run the script
 
@@ -35,21 +41,12 @@ cp .env-example .env
 
 ```
 
-Copy and make necessary changes to the init-mongo-EXAMPLE.js 
-```
-cp init-mongo-EXAMPLE.js init-mongo.js
-
-```
-
 Run docker-compose
 ```
 docker-compose up -d
 
 ```
 
-
 ### Troubleshooting
 
 Running portainer will allow you to read container log files more easily.
-
-check that the connection between unifi and the mongo container is working fine.

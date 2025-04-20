@@ -18,6 +18,39 @@ services:
     networks:
       - locMgnt
 
+###########
+# PI-HOLE #
+###########
+  pihole:
+    image: pihole/pihole:4.3.2-1
+    container_name: mgnt-pihole
+    hostname: dckvm-piHole
+    restart: ${RESTART_POLICY}
+    env_file: .env
+    volumes:
+      - "./data/pihole/etc-pihole:/etc/pihole"
+      - "./data/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
+      - "./init/resolv.conf:/etc/resolv.conf"
+    ports:
+      - "53:53/tcp"
+      - "10.72.72.2:53:53/udp"
+      - "81:80/tcp"
+      - "443:443/tcp"
+    cap_add:
+      - NET_ADMIN
+    dns:
+      - ${DNS01}
+      - ${DNS02}
+    environment:
+      - DNS1=${DNS01}
+      - DNS2=${DNS02}
+      - ServerIP=${PIHOLE_IP}
+      - DNSMASQ_LISTENING=all
+      - WEBPASSWORD=${PIHOLE_PASS}
+      - TZ= ${TZ}
+      - mac-address=${PIHOLE_MAC}
+    networks:
+      - mainLan
 
 ####################
 # UNIFI CONTROLLER #

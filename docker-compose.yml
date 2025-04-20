@@ -23,7 +23,7 @@ services:
 # UNIFI CONTROLLER #
 ####################
   mgnt-unifi:
-    image: linuxserver/unifi-controller:arm32v5-latest
+    image: linuxserver/unifi-controller:arm32v6-latest
     container_name: mgnt-unifi
     restart: ${RESTART_POLICY}
     env_file: .env

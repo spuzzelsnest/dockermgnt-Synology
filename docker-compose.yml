@@ -3,7 +3,7 @@ services:
 # PORTAINER #
 #############
   portainer:
-    image: portainer/portainer-ce
+    image: portainer/portainer:linux-arm-2.0.1
     container_name: mgnt-portainer
     restart: ${RESTART_POLICY}
     volumes:

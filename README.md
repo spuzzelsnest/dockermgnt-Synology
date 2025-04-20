@@ -1,5 +1,19 @@
 # dockermgnt
-A stack I use on my Synology NAS, running piHole, unifi-Controller, Portainer, LibreNMS
+A stack I use on my Synology NAS, running piHole, unifi-Controller, Portainer, LibreNMS. I have created different branches for different hardware. If you are not sure if this would run on your hardware, you can check the next section, which branch can be used in your case.
+
+## Pre-checks
+### CPU-info
+If you are running this on different hardware, you can check your hardware like so:
+
+```
+uname -a
+
+```
+or 
+```
+cat /proc/cpuinfo | grep -e 'model'
+
+```
 
 ## How It works
 

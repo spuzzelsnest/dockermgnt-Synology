@@ -40,6 +40,8 @@ docker network create -d macvlan --subnet 192.168.1.0/24 --gateway 192.168.1.1 -
 
 ```
 
+If you are running docker on the same interface as the gateway of your network, please look into the createSubnet.EXAMPLE
+Changing the into to you liking, this creates a virtual interface to handle the traffic between pihole and the gateway.
 
 ### Run the script
 
@@ -67,3 +69,5 @@ docker-compose up -d
 Running portainer will allow you to read container log files more easily.
 
 check that the connection between unifi and the mongo container is working fine.
+
+

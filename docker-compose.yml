@@ -97,31 +97,6 @@ services:
       mainLan:
         ipv4_address: ${MONGODB_IP}
 
-##########
-# MYSQL #
-#########
-  mgnt-mysql:
-    image: mysql:8.0
-    command: --sql-mode=""
-    ports:
-      - "3306"
-    volumes:
-      - "./data/mysql:/var/lib/mysql"
-    environment:
-      - TZ=${TZ}
-      - MYSQL_ROOT_PASSWORD=${LIBRENMS_ROOT_PASS}
-      - MYSQL_USER=${LIBRENMS_DB_USER}
-      - MYSQL_PASSWORD=${LIBRENMS_DB_PASS}
-      - MYSQL_DATABASE=${LIBRENMS_DB_NAME}
-    healthcheck:
-      test: "mysql -h localhost -u root -p$$MYSQL_ROOT_PASSWORD -e 'USE librenms'"
-      interval: 5s
-      timeout: 5s
-      retries: 20
-    networks:
-      mainLan:
-        ipv4_address: ${MYSQL_IP}
-
 #############
 # PORTAINER #
 #############
@@ -141,38 +116,6 @@ services:
     networks:
       - locMgnt
  
-############
-# LIBRENMS #
-############
-  mgnt-librenms:
-    image: librenms/librenms:latest
-    container_name: mgnt-librenms
-    hostname: dckvm-libreNMS
-    restart: ${RESTART_POLICY}
-    environment:
-      - TZ=${TZ}
-      - APP_KEY=${LIBRENMS_API_KEY}
-      - DB_HOST=${MYSQL_IP}
-      - DB_NAME=${LIBRENMS_DB_HOST}
-      - DB_USER=${LIBRENMS_DB_USER}
-      - DB_PASS=${LIBRENMS_DB_PASS}
-      - POLLERS=16
-      - BASE_URL=${LIBRENMS_BASE_URL}
-      - DAILY_ON_STARTUP=true
-    volumes:
-      - "./data/libreNMS/logs:/opt/librenms/logs"
-      - "./data/libreNMS/rrd:/opt/librenms/rrd"
-    networks:
-      mainLan:
-        ipv4_address: ${LIBRENMS_IP}
-    ports:
-      - ${LIBRENMS_PORT}:80
-    links:
-      - mgnt-mysql:db
-    depends_on:
-      mgnt-mysql:
-        condition: service_healthy
-
 volumes:
   data:
 

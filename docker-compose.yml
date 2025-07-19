@@ -88,7 +88,7 @@ services:
       - MONG_USER=${UNIFI_DB_USER}
       - MONGO_PASS=${UNIFI_DB_PASS}
       - MONGO_DBNAME=${UNIFI_DB_NAME}
-      - MONGO_AUTHSOURCE=${DB_ADMIN_USER}
+      - MONGO_AUTHSOURCE=${MONGO_AUTH}
     volumes:
       - "./init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro"
     ports:

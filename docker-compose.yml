@@ -100,27 +100,27 @@ services:
 ##########
 # MYSQL #
 #########
-#  mgnt-mysql:
-#    image: mysql:8.0
-#    command: --sql-mode=""
-#    ports:
-#      - "3306"
-#    volumes:
-#      - "./data/mysql:/var/lib/mysql"
-#    environment:
-#      - TZ=${TZ}
-#      - MYSQL_ROOT_PASSWORD=${LIBRENMS_ROOT_PASS}
-#      - MYSQL_USER=${LIBRENMS_DB_USER}
-#      - MYSQL_PASSWORD=${LIBRENMS_DB_PASS}
-#      - MYSQL_DATABASE=${LIBRENMS_DB_NAME}
-#    healthcheck:
-#      test: "mysql -h localhost -u root -p$$MYSQL_ROOT_PASSWORD -e 'USE librenms'"
-#      interval: 5s
-#      timeout: 5s
-#      retries: 20
-#    networks:
-#      mainLan:
-#        ipv4_address: ${MYSQL_IP}
+  mgnt-mysql:
+    image: mysql:8.0
+    command: --sql-mode=""
+    ports:
+      - "3306"
+    volumes:
+      - "./data/mysql:/var/lib/mysql"
+    environment:
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${LIBRENMS_ROOT_PASS}
+      - MYSQL_USER=${LIBRENMS_DB_USER}
+      - MYSQL_PASSWORD=${LIBRENMS_DB_PASS}
+      - MYSQL_DATABASE=${LIBRENMS_DB_NAME}
+    healthcheck:
+      test: "mysql -h localhost -u root -p$$MYSQL_ROOT_PASSWORD -e 'USE librenms'"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      mainLan:
+        ipv4_address: ${MYSQL_IP}
 
 #############
 # PORTAINER #

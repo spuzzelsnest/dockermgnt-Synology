@@ -93,6 +93,12 @@ services:
       - "./init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro"
     ports:
       - 27017:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
     networks:
       mainLan:
         ipv4_address: ${MONGODB_IP}

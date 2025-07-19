@@ -62,7 +62,17 @@ Run docker-compose
 docker-compose up -d
 
 ```
+### Setting up Pihole 
 
+If there is an issue with the password of the pihole container you can run the following commands 
+
+
+```
+docker exec -it mgnt-pihole bash
+
+pihole setpassword
+
+```
 
 ### Troubleshooting
 

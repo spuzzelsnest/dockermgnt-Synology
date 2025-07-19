@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ip link add lnk01 link [MAIN INTERFACE] type macvlan mode bridge
+ip addr add [IP-ADDRESS]/32 dev lnk01
+ip link set lnk01 up
+ip route add [IP-ADDRESS-RANGE]/[CIDR] dev lnk01
+
+
+#ip link set eth1 promisc on
+
+ifconfig eth1
+ifconfig lnk01
+
+
+# reroute pihole container
+
+docker exec mgnt-pihole ip route
+docker exec mgnt-pihole ip route del default
+docker exec mgnt-pihole ip route add default via [IP-ADDRESS]

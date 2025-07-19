@@ -2,5 +2,7 @@
 .env
 init/init-mongo.js
 
+createSubnet.sh
+
 # Data dir for conf files
 data/

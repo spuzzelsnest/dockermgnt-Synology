@@ -50,10 +50,10 @@ services:
       - MONGO_HOST=mgnt-mongo
       - MONGO_PORT=27017
       - MONGO_DBNAME=${UNIFI_DB_NAME}
-      - MEM_LIMIT=1024 #optional
-      - MEM_STARTUP=1024 #optional
-      - MONGO_TLS=false #optional
-      - MONGO_AUTHSOURCE=admin #optional
+      - MEM_LIMIT=1024
+      - MEM_STARTUP=1024
+      - MONGO_TLS=false
+      - MONGO_AUTHSOURCE=${MONGO_AUTH}
     volumes:
       - "./data/unifi:/config"
     ports:
@@ -87,7 +87,7 @@ services:
       - MONGO_INITDB_DATABASE=${DB_ADMIN_USER}
       - MONG_USER=${UNIFI_DB_USER}
       - MONGO_PASS=${UNIFI_DB_PASS}
-      - MONGO_DB=${UNIFI_DB_NAME}
+      - MONGO_DBNAME=${UNIFI_DB_NAME}
       - MONGO_AUTHSOURCE=${DB_ADMIN_USER}
     volumes:
       - "./init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro"

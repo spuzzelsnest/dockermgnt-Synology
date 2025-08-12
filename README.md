@@ -47,14 +47,12 @@ docker-compose up -d
 
 ```
 
-### Setup of Observium
+### Setup of LibreNMS
 
-Create the user for the initial setup 
+This image depends on mysql database. After the instalation is completed, goto the website to validate the install.
 
 ```
-docker exec -it mgnt-observium bash
-
-./adduser.php <username> <password> <level>
+http://192.168.100.3:8000/validate
 
 ```
 

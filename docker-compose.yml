@@ -66,7 +66,7 @@ services:
 #      mainLan:
 #        ipv4_address: ${UNIFI_IP}
 #    depends_on:
-#      - mgnt-mongo
+#      mgnt-mongo:
 #        condition: service_healthy
 
 ############
@@ -84,6 +84,12 @@ services:
 #      - ./init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 #    ports:
 #      - 27017:27017
+#    healthcheck:
+#      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+#      interval: 40s
+#      timeout: 30s
+#      retries: 3
+#      start_period: 60s
 #    networks:
 #      mainLan:
 #        ipv4_address: ${DB_IP}
@@ -93,6 +99,7 @@ services:
 #########
   mgnt-mysql:
     image: mysql:8.0
+    container_name: mgnt-mysql
     command: --sql-mode=""
     ports:
       - "3306"
@@ -142,11 +149,12 @@ services:
     restart: ${RESTART_POLICY}
     environment:
       - TZ=${TZ}
-      - APP_KEY=${LIBRENMS_API_KEY}
+      - PUID=1001
+      - PGID=1001
       - DB_HOST=${MYSQL_IP}
-      - DB_NAME=${LIBRENMS_DB}
-      - DB_USER=${LIBRENMS_USER}
-      - DB_PASS=${LIBRENMS_PASS}
+      - DB_NAME=${LIBRENMS_DB_NAME}
+      - DB_USER=${LIBRENMS_DB_USER}
+      - DB_PASS=${LIBRENMS_DB_PASS}
       - POLLERS=16
       - BASE_URL=http://localhost
       - DAILY_ON_STARTUP=true

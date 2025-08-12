@@ -52,9 +52,20 @@ docker-compose up -d
 This image depends on mysql database. After the instalation is completed, goto the website to validate the install.
 
 ```
-http://192.168.100.3:8000/validate
+http://[LIBRENMS_IP]:[LIBRENMS_PORT]/validate
 
 ```
+
+If there is an issue with the API key, you can use this code to rotate the key.
+
+
+```
+
+docker exec -it --user 1000:1000 mgnt-librenms lnms key:rotate  --generate-new-key
+
+```
+
+
 
 ### Troubleshooting
 

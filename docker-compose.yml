@@ -149,8 +149,8 @@ services:
     restart: ${RESTART_POLICY}
     environment:
       - TZ=${TZ}
-      - PUID=1001
-      - PGID=1001
+      - PUID=${PUID}
+      - PGID=${PGID}
       - DB_HOST=${MYSQL_IP}
       - DB_NAME=${LIBRENMS_DB_NAME}
       - DB_USERNAME=${LIBRENMS_DB_USER}

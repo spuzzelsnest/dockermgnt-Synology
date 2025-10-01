@@ -27,7 +27,10 @@ services:
       - TZ= ${TZ}
       - mac-address=${PIHOLE_MAC}
     networks:
-      - mainLan
+      mainLan:
+        ipv4_address: 192.168.100.2
+      iotVlan:
+        ipv4_address: 10.16.66.10
 
 ####################
 # UNIFI CONTROLLER #
@@ -195,7 +198,7 @@ networks:
     name: iotVlan
     driver: macvlan
     driver_opts:
-      parent: ${NET_INT}
+      parent: ${NET_INT}.666
     ipam:
       config:
         - subnet: ${IOT_SUB}

@@ -180,8 +180,8 @@ volumes:
 networks:
   locMgnt:
     driver: bridge
+# MainLAN
   mainLan:
-# If network gets created by docker compose
     name: mainLan
     driver: macvlan
     driver_opts:
@@ -190,5 +190,16 @@ networks:
       config:
         - subnet: ${IP_SUB}
           gateway: ${IP_GAT}
+# IOT VLAN
+  iotVlan:
+    name: iotVlan
+    driver: macvlan
+    driver_opts:
+      parent: ${NET_INT}
+    ipam:
+      config:
+        - subnet: ${IOT_SUB}
+          gateway: ${IOT_GAT}
+
 # If network is created externally 
 #    external: true

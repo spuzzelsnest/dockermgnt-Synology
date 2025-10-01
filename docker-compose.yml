@@ -156,8 +156,9 @@ services:
       - DB_USERNAME=${LIBRENMS_DB_USER}
       - DB_PASSWORD=${LIBRENMS_DB_PASS}
       - POLLERS=16
-      - BASE_URL=${LIBRENMS_BASE_URL}
+      - BASE_URL=${APP_URL}
       - DAILY_ON_STARTUP=true
+      - APP_KEY=${APP_KEY}
     volumes:
       - "./data/libreNMS/rrd:/opt/librenms/rrd"
     networks:

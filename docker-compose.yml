@@ -44,7 +44,9 @@ services:
     env_file: .env
     volumes:
       - ".data/homeassistant:/config"
-    network_mode: "host"  # all
+    networks:
+      iotVlan:
+        ipv4_address: 10.16.66.11
 
 ##########
 # MYSQL #

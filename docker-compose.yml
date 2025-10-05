@@ -31,7 +31,6 @@ services:
       mainLan:
         ipv4_address: ${PIHOLE_IP}
       iotVlan:
-        ipv4_address: ${IOT_IP}
 
 #################
 # HomeAssistant #
@@ -44,9 +43,13 @@ services:
     env_file: .env
     volumes:
       - ".data/homeassistant:/config"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ= ${TZ}
     networks:
       iotVlan:
-        ipv4_address: 10.16.66.11
+        ipv4_address: ${HA_IP}
 
 ##########
 # MYSQL #
@@ -144,7 +147,7 @@ networks:
       config:
         - subnet: ${IP_SUB}
           gateway: ${IP_GAT}
-# IOT VLAN
+# IOT VLAN - id 666
   iotVlan:
     name: iotVlan
     driver: macvlan

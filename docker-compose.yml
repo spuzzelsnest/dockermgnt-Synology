@@ -33,6 +33,19 @@ services:
       iotVlan:
         ipv4_address: ${IOT_IP}
 
+#################
+# HomeAssistant #
+#################
+  homeassistant:
+    image: homeassistant/raspberrypi4-homeassistant:latest
+    container_name: mgnt-homeassistant
+    hostname: dckvm-homeassistant
+    restart: ${RESTART_POLICY}
+    env_file: .env
+    volumes:
+      - ".data/homeassistant:/config"
+    network_mode: "host"  # all
+
 ##########
 # MYSQL #
 #########

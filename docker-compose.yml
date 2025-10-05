@@ -31,6 +31,7 @@ services:
       mainLan:
         ipv4_address: ${PIHOLE_IP}
       iotVlan:
+        ipv4_address: ${PIHOLE_IOT_IP}
 
 #################
 # HomeAssistant #
@@ -48,8 +49,8 @@ services:
       - PGID=${PGID}
       - TZ= ${TZ}
     networks:
-      iotVlan:
-        ipv4_address: ${HA_IP}
+      mainLan:
+        ipv4_address: ${HA_MAIN_IP}
 
 ##########
 # MYSQL #

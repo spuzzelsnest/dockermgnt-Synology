@@ -47,7 +47,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ= ${TZ}
+      - TZ=${TZ}
     networks:
       mainLan:
         ipv4_address: ${HA_MAIN_IP}

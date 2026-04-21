@@ -1,0 +1,10 @@
+#!/bin/bash
+
+sudo ip link add br-iotVlan link eth0.[VLANID] type macvlan mode bridge
+sudo ip addr add [NETWORK_ADDRESS]/[CIDR] dev br-iotVlan
+sudo ip link set br-iotVlan up
+
+sudo ifconfig eth0.[VLANID]
+sudo ifconfig br-iotVlan
+
+docker exec -it mgnt-pihole ping [IOT-GW] -c3

@@ -27,11 +27,16 @@ services:
       - WEBPASSWORD=${PIHOLE_PASS}
       - TZ= ${TZ}
       - mac-address=${PIHOLE_MAC}
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+      - "443:443/tcp"
     networks:
       mainLan:
         ipv4_address: ${PIHOLE_IP}
-      iotVlan:
-        ipv4_address: ${PIHOLE_IOT_IP}
+#      iotVlan:
+#        ipv4_address: ${PIHOLE_IOT_IP}
 
 #################
 # HomeAssistant #
@@ -43,7 +48,7 @@ services:
     restart: ${RESTART_POLICY}
     env_file: .env
     volumes:
-      - ".data/homeassistant:/config"
+      - "./data/homeassistant:/config"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}

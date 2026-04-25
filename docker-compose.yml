@@ -1,6 +1,26 @@
 version: "3.9"
 
 services:
+
+#############
+# PORTAINER #
+#############
+  portainer:
+    image: portainer/portainer-ce
+    container_name: mgnt-portainer
+    restart: ${RESTART_POLICY}
+    volumes:
+      - "${DOCKER_SOCKET}:/var/run/docker.sock"
+      - "./data/portainer:/data"
+    ports:
+      - ${PORTAINER_PORT_UI}:9000
+      - ${PORTAINER_PORT_SSL}:8000
+    expose:
+      - ${PORTAINER_PORT_UI}
+      - ${PORTAINER_PORT_SSL}
+    networks:
+      - locMgnt
+
 ###########
 # PI-HOLE #
 ###########
@@ -83,32 +103,13 @@ services:
       mainLan:
         ipv4_address: ${MYSQL_IP}
 
-#############
-# PORTAINER #
-#############
-  portainer:
-    image: portainer/portainer-ce
-    container_name: mgnt-portainer
-    restart: ${RESTART_POLICY}
-    volumes:
-      - "${DOCKER_SOCKET}:/var/run/docker.sock"
-      - "./data/portainer:/data"
-    ports:
-      - ${PORTAINER_PORT_UI}:9000
-      - ${PORTAINER_PORT_SSL}:8000
-    expose:
-      - ${PORTAINER_PORT_UI}
-      - ${PORTAINER_PORT_SSL}
-    networks:
-      - locMgnt
-
-############
-# LIBRENMS #
-############
+#################
+# LIBRENMS CORE #
+#################
   mgnt-librenms:
     image: librenms/librenms:latest
     container_name: mgnt-librenms
-    hostname: dckvm-libreNMS
+    hostname: dckvm-librenms
     restart: ${RESTART_POLICY}
     environment:
       - TZ=${TZ}
@@ -118,12 +119,14 @@ services:
       - DB_NAME=${LIBRENMS_DB_NAME}
       - DB_USERNAME=${LIBRENMS_DB_USER}
       - DB_PASSWORD=${LIBRENMS_DB_PASS}
+      - SIDECAR_DISPATCHER=1
+      - SIDECAR_SNMPTRAPD=1
       - POLLERS=16
       - BASE_URL=${APP_URL}
       - DAILY_ON_STARTUP=true
       - APP_KEY=${APP_KEY}
     volumes:
-      - "./data/libreNMS/rrd:/opt/librenms/rrd"
+      - "./data/libreNMS/:/data"
     networks:
       mainLan:
         ipv4_address: ${LIBRENMS_IP}
@@ -136,6 +139,37 @@ services:
     depends_on:
       mgnt-mysql:
         condition: service_healthy
+
+##############
+# DISPATCHER #
+##############
+  mgnt-dispatcher:
+    image: librenms/librenms:latest
+    container_name: mgnt-dispatcher
+    hostname: dckvm-dispatcher
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    depends_on:
+      - mgnt-librenms
+    volumes:
+      - "./data/libreNMS/:/data"
+    env_file:
+      - "./librenms.env"
+    environment:
+      - "TZ=${TZ}"
+      - "PUID=${PUID}"
+      - "PGID=${PGID}"
+      - "DB_HOST=db"
+      - "DB_NAME=${MYSQL_DATABASE}"
+      - "DB_USER=${MYSQL_USER}"
+      - "DB_PASSWORD=${MYSQL_PASSWORD}"
+      - "DB_TIMEOUT=60"
+      - "DISPATCHER_NODE_ID=dispatcher1"
+      - "SIDECAR_DISPATCHER=1"
+    restart: always
+
+
 
 volumes:
   data:

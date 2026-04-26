@@ -110,13 +110,15 @@ services:
   mgnt-redis:
     image: redis:7.2-alpine
     container_name: mgnt-redis
-    environment:
-      - TZ=${TZ}
+    command: redis-server /usr/local/etc/redis/redis.conf
     restart: ${RESTART_POLICY}
     ports:
       - "6379:6379"
     volumes:
       - "./data/redis:/data"
+      - "./redis.conf:/usr/local/etc/redis/redis.conf:ro"
+    environment:
+      - TZ=${TZ}
     networks:
       mainLan:
         ipv4_address: ${REDIS_IP}

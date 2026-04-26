@@ -84,6 +84,7 @@ services:
     image: mysql:8.0
     container_name: mgnt-mysql
     command: --sql-mode=""
+    restart: ${RESTART_POLICY}
     ports:
       - "3306"
     volumes:
@@ -102,6 +103,23 @@ services:
     networks:
       mainLan:
         ipv4_address: ${MYSQL_IP}
+
+#########
+# REDIS #
+#########
+  mgnt-redis:
+    image: redis:7.2-alpine
+    container_name: mgnt-redis
+    environment:
+      - TZ=${TZ}
+    restart: ${RESTART_POLICY}
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./data/redis:/data"
+    networks:
+      mainLan:
+        ipv4_address: ${REDIS_IP}
 
 #################
 # LIBRENMS CORE #
@@ -127,6 +145,8 @@ services:
       - APP_KEY=${APP_KEY}
     volumes:
       - "./data/libreNMS/:/data"
+    env_file:
+      - "./librenms.env"
     networks:
       mainLan:
         ipv4_address: ${LIBRENMS_IP}
@@ -152,24 +172,23 @@ services:
       - NET_RAW
     depends_on:
       - mgnt-librenms
+      - mgnt-redis
     volumes:
       - "./data/libreNMS/:/data"
     env_file:
       - "./librenms.env"
     environment:
-      - "TZ=${TZ}"
-      - "PUID=${PUID}"
-      - "PGID=${PGID}"
-      - "DB_HOST=db"
-      - "DB_NAME=${MYSQL_DATABASE}"
-      - "DB_USER=${MYSQL_USER}"
-      - "DB_PASSWORD=${MYSQL_PASSWORD}"
-      - "DB_TIMEOUT=60"
-      - "DISPATCHER_NODE_ID=dispatcher1"
-      - "SIDECAR_DISPATCHER=1"
-    restart: always
-
-
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DB_HOST=${MYSQL_IP}
+      - DB_NAME=${LIBRENMS_DB_NAME}
+      - DB_USERNAME=${LIBRENMS_DB_USER}
+      - DB_PASSWORD=${LIBRENMS_DB_PASS}
+      - DB_TIMEOUT=60
+      - DISPATCHER_NODE_ID=dispatcher1
+      - SIDECAR_DISPATCHER=1
+    restart: ${RESTART_POLICY}
 
 volumes:
   data:

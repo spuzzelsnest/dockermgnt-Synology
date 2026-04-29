@@ -1,23 +1,18 @@
-version: "3.9"
-
 services:
 
 #############
 # PORTAINER #
 #############
   portainer:
-    image: portainer/portainer-ce
+    image: portainer/portainer-ce:sts
     container_name: mgnt-portainer
     restart: ${RESTART_POLICY}
     volumes:
       - "${DOCKER_SOCKET}:/var/run/docker.sock"
       - "./data/portainer:/data"
     ports:
-      - ${PORTAINER_PORT_UI}:9000
-      - ${PORTAINER_PORT_SSL}:8000
-    expose:
-      - ${PORTAINER_PORT_UI}
-      - ${PORTAINER_PORT_SSL}
+      - ${PORTAINER_PORT_SSL}:9443
+      - ${PORTAINER_PORT_UI}:8000
     networks:
       - locMgnt
 
@@ -62,7 +57,8 @@ services:
 # HomeAssistant #
 #################
   homeassistant:
-    image: homeassistant/raspberrypi4-homeassistant:latest
+#    image: homeassistant/raspberrypi4-homeassistant:latest
+    image: homeassistant/home-assistant:latest
     container_name: mgnt-homeassistant
     hostname: dckvm-homeassistant
     restart: ${RESTART_POLICY}
